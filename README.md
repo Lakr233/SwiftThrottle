@@ -28,8 +28,16 @@ throttle.throttle {
 }
 ```
 
+## Explanation
+
+- The **first** execution is released **immediately** and the timestamp is recorded as **0**.
+- Subsequent executions will enter the throttling control valve and will be **cancelled** if the execution interval is too short.
+- The **last execution**, **if cancelled**, will be reprogrammed to execute **immediately after** the time reaches the required interval.
+
+![Explain](Explain.png)
+
 ---
 
-2021-07-04
+2021-08-01
 
 Copyright © 2021 Lakr Aream. All rights reserved.

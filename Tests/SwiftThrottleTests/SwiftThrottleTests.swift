@@ -2,7 +2,7 @@
 import XCTest
 
 /// Indicates how long the test will run
-let multithreadThreshold = 10
+let multithreadThreshold = 30
 
 final class SwiftThrottleTests: XCTestCase {
     /// Test the throttle
