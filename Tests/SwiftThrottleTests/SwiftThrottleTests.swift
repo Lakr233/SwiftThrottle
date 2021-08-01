@@ -2,7 +2,7 @@
 import XCTest
 
 /// Indicates how long the test will run
-let multithreadThreshold = 30
+let multithreadThreshold = 10
 
 final class SwiftThrottleTests: XCTestCase {
     /// Test the throttle
@@ -25,7 +25,8 @@ final class SwiftThrottleTests: XCTestCase {
             }
             print("Terminating throttle test...")
             testShouldTerminate = true
-            sleep(1)
+            print("Waiting for ending expectation assertions to arrive...")
+            sleep(5)
             sem.signal()
         }
 
@@ -49,6 +50,12 @@ final class SwiftThrottleTests: XCTestCase {
                     while !testShouldTerminate {
                         throttle.throttle { hit += 1 }
                     }
+                    var endingExpectation = ""
+                    let expectValue = "ending.call.successed"
+                    throttle.throttle { endingExpectation = expectValue }
+                    usleep(UInt32(emitter * 1_000_000) * 2)
+                    XCTAssert(endingExpectation == expectValue,
+                              "Throttle failed to program last execution")
                     results_lock.lock()
                     results.append(hit)
                     results_lock.unlock()
@@ -87,6 +94,6 @@ final class SwiftThrottleTests: XCTestCase {
          this shows that you will still need to handle GCD concurrency in your app in a right way
          this is not a bug
 
-         */        
+         */
     }
 }

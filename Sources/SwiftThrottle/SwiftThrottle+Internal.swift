@@ -18,10 +18,17 @@ public extension Throttle {
 
     /// Assign job to throttle
     /// - Parameter job: call block
-    func throttle(job: (() -> Void)?) {
-        // resign job every time
-        assignment = job
-        guard let capturedJob = job else { return }
+    func throttle(job: (() -> Void)?, useAssignment: Bool = false) {
+        // if called from rescheduled job, cancel job overwrite
+        var capturedJobDecision: (() -> Void)?
+        if !useAssignment {
+            // resign job every time calling from user
+            assignment = job
+            capturedJobDecision = job
+        } else {
+            capturedJobDecision = assignment
+        }
+        guard let capturedJob = capturedJobDecision else { return }
 
         // lock down every thing when resigning job
         executeLock.lock()
@@ -49,7 +56,7 @@ public extension Throttle {
                     // Preventing trigger failures
                     // This is where the inaccuracy comes from
                     workingQueue.asyncAfter(deadline: .now() + dispatchTime) {
-                        self.throttle(job: capturedJob)
+                        self.throttle(job: nil, useAssignment: true)
                         self.scheduled = false
                     }
                 }
